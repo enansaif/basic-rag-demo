@@ -2,6 +2,11 @@ from app.config import config
 from fastapi import FastAPI, UploadFile, File, Body, HTTPException
 from fastapi.responses import RedirectResponse
 from app import utils
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 app = FastAPI()
 
@@ -19,6 +24,8 @@ async def process_single_file(file):
     chunks = utils.chunk_text(text, config.CHUNK_SIZE, config.CHUNK_OVERLAP)
 
     ids, embeddings, metadatas, documents = utils.process_chunks(chunks, config, file.filename)
+
+    logger.info(f"Upserting {len(documents)} documents for file '{file.filename}'")
 
     config.collection.upsert(
         ids=ids,
@@ -63,6 +70,7 @@ async def ask_llm(question: str = Body(..., embed=True)):
         results = utils.query_db(question, config)
 
         retrieved_docs = results.get("documents", [[]])[0]
+        logger.info(f"Retrieved {len(retrieved_docs)} docs from vector DB")
         if not retrieved_docs:
             return {"response": "No relevant documents found."}
 
