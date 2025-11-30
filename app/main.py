@@ -1,30 +1,15 @@
-import os
+from app.config import config
 from fastapi import FastAPI, UploadFile, File, Body, HTTPException
-from google import genai
-from app.utils import *
-import chromadb
-from chromadb.config import Settings
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-CHROMA_HOST = os.getenv("CHROMA_HOST")
-CHROMA_PORT = os.getenv("CHROMA_PORT")
-
-client = genai.Client(api_key=GEMINI_API_KEY)
+from fastapi.responses import RedirectResponse
+from app import utils
 
 app = FastAPI()
 
-chroma_client = chromadb.HttpClient(
-    host=CHROMA_HOST,
-    port=CHROMA_PORT,
-    settings=Settings(anonymized_telemetry=False)
-)
-collection = chroma_client.get_or_create_collection(
-    name="documents",
-    metadata={"hnsw:space": "cosine"}
-)
 
-@app.get("/")
+@app.get("/", include_in_schema=False)
 async def root():
-    return {"message": "The app is alive!!!!!!!!!!!!!!"}
+    return RedirectResponse(url="/docs")
+
 
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
@@ -35,25 +20,11 @@ async def upload_file(file: UploadFile = File(...)):
         if not text.strip():
             raise HTTPException(status_code=400, detail="Uploaded file is empty.")
 
-        chunks = chunk_text(text, chunk_size=1000, overlap=200)
+        chunks = utils.chunk_text(text, config.CHUNK_SIZE, config.CHUNK_OVERLAP)
 
-        ids = []
-        embeddings = []
-        metadatas = []
-        documents = []
+        ids, embeddings, metadatas, documents = utils.process_chunks(chunks, config, file.filename)
 
-        for i, chunk in enumerate(chunks):
-            emb = client.models.embed_content(
-                model="models/text-embedding-004",
-                contents=chunk
-            ).embeddings[0].values
-
-            ids.append(f"{file.filename}_chunk_{i}")
-            embeddings.append(emb)
-            metadatas.append({"filename": file.filename, "chunk": i})
-            documents.append(chunk)
-
-        collection.upsert(
+        config.collection.upsert(
             ids=ids,
             embeddings=embeddings,
             metadatas=metadatas,
@@ -69,33 +40,25 @@ async def upload_file(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.post("/ask")
 async def ask_llm(question: str = Body(..., embed=True)):
     try:
         if not question.strip():
             raise HTTPException(status_code=400, detail="Question cannot be empty.")
 
-        q_embedding = client.models.embed_content(
-            model="models/text-embedding-004",
-            contents=question
-        ).embeddings[0].values
-
-        results = collection.query(
-            query_embeddings=[q_embedding],
-            n_results=5
-        )
+        results = utils.query_db(question, config)
 
         retrieved_docs = results.get("documents", [[]])[0]
-        print(retrieved_docs)
         if not retrieved_docs:
             return {"response": "No relevant documents found."}
 
         context = "\n\n".join(retrieved_docs)
 
-        final_prompt = generate_final_prompt(context, question)
+        final_prompt = utils.generate_final_prompt(context, question)
 
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
+        response = config.llm_client.models.generate_content(
+            model=config.GENERATION_MODEL,
             contents=final_prompt
         )
 

@@ -4,6 +4,7 @@ from app.main import app
 
 client = TestClient(app)
 
+
 def test_ask_llm():
     response = client.post("/ask")
     assert response.status_code == 200
