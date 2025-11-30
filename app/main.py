@@ -5,44 +5,53 @@ from app import utils
 
 app = FastAPI()
 
+async def process_single_file(file):
+    content = await file.read()
+
+    if file.content_type == "application/pdf":
+        text = utils.extract_text_from_pdf(content)
+    else:
+        text = content.decode("utf-8", errors="ignore")
+
+    if not text.strip():
+        raise HTTPException(status_code=400, detail="Uploaded file is empty.")
+
+    chunks = utils.chunk_text(text, config.CHUNK_SIZE, config.CHUNK_OVERLAP)
+
+    ids, embeddings, metadatas, documents = utils.process_chunks(chunks, config, file.filename)
+
+    config.collection.upsert(
+        ids=ids,
+        embeddings=embeddings,
+        metadatas=metadatas,
+        documents=documents
+    )
+
+    return {
+        "status": "success",
+        "filename": file.filename,
+        "chunks": len(chunks)
+    }
 
 @app.get("/", include_in_schema=False)
 async def root():
     return RedirectResponse(url="/docs")
 
 
-@app.post("/upload-single")
-async def upload_file(file: UploadFile = File(...)):
-    try:
-        content = await file.read()
+@app.post("/upload")
+async def upload_files(files: list[UploadFile] = File(...)):
+    if len(files) > 3:
+        raise HTTPException(status_code=400, detail="Maximum 3 files allowed.")
 
-        if file.content_type == "application/pdf":
-            text = utils.extract_text_from_pdf(content)
-        else:
-            text = content.decode("utf-8", errors="ignore")
+    results = []
+    for file in files:
+        result = await process_single_file(file)
+        results.append(result)
 
-        if not text.strip():
-            raise HTTPException(status_code=400, detail="Uploaded file is empty.")
-
-        chunks = utils.chunk_text(text, config.CHUNK_SIZE, config.CHUNK_OVERLAP)
-
-        ids, embeddings, metadatas, documents = utils.process_chunks(chunks, config, file.filename)
-
-        config.collection.upsert(
-            ids=ids,
-            embeddings=embeddings,
-            metadatas=metadatas,
-            documents=documents
-        )
-
-        return {
-            "status": "success",
-            "filename": file.filename,
-            "chunks": len(chunks)
-        }
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    return {
+        "status": "success",
+        "files": results
+    }
 
 
 @app.post("/ask")

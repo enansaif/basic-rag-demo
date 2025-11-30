@@ -61,7 +61,7 @@ def process_chunks(chunks, config, filename):
     return ids, embeddings, metadatas, documents
 
 
-def extract_text_from_pdf(file_bytes: bytes) -> str:
+def extract_text_from_pdf(file_bytes):
     text = ""
     reader = PdfReader(io.BytesIO(file_bytes))
     for page in reader.pages:
