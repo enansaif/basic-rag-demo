@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, Body, HTTPException
 from google import genai
 from app.utils import *
 import chromadb
@@ -70,5 +70,40 @@ async def upload_file(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/ask")
-async def ask_llm():
-    return {"response": "Hello World"}
+async def ask_llm(question: str = Body(..., embed=True)):
+    try:
+        if not question.strip():
+            raise HTTPException(status_code=400, detail="Question cannot be empty.")
+
+        q_embedding = client.models.embed_content(
+            model="models/text-embedding-004",
+            contents=question
+        ).embeddings[0].values
+
+        results = collection.query(
+            query_embeddings=[q_embedding],
+            n_results=5
+        )
+
+        retrieved_docs = results.get("documents", [[]])[0]
+        print(retrieved_docs)
+        if not retrieved_docs:
+            return {"response": "No relevant documents found."}
+
+        context = "\n\n".join(retrieved_docs)
+
+        final_prompt = generate_final_prompt(context, question)
+
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=final_prompt
+        )
+
+        return {
+            "question": question,
+            "answer": response.text,
+            "sources": retrieved_docs
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

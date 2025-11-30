@@ -9,3 +9,17 @@ def chunk_text(text, chunk_size = 1000, overlap = 200):
         end = start + chunk_size
 
     return chunks
+
+def generate_final_prompt(context, question):
+    prompt = f"""
+        Use the following context to answer.
+
+        CONTEXT:
+        {context}
+
+        QUESTION:
+        {question}
+
+        If the context does not contain the answer, say "I don’t know."
+    """
+    return prompt
