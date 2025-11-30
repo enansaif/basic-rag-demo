@@ -60,7 +60,13 @@ No Image Processing: Currently images in pdf are just ignored.
 
 ## Future Improvements
 
-Points in the limitations section would be considered for future improvements.
+Add support for additional document types such as DOCX, HTML, Markdown.
+Parallel processing to handle large document sets efficiently.
+Implement more robust error-handling mechanisms, including detailed logs, graceful fallbacks, and user-friendly error messages.
+Replace fixed-size chunking with more intelligent methods (semantic chunking or recursive text splitting) to improve context retention and retrieval accuracy.
+Add caching for repeated or similar queries.
+Integrate advanced prompt management tools (LangChain’s prompt library).
+Incorporate OCR and image embedding extraction so that images inside PDFs are analyzed.
 
 ## Video Link
 https://drive.google.com/file/d/1OU1tUqTtWh5r6jjx3jv9yegXSwn9KmoG/view?usp=sharing
