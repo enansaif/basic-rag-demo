@@ -70,7 +70,9 @@ async def ask_llm(question: str = Body(..., embed=True)):
         results = utils.query_db(question, config)
 
         retrieved_docs = results.get("documents", [[]])[0]
+
         logger.info(f"Retrieved {len(retrieved_docs)} docs from vector DB")
+
         if not retrieved_docs:
             return {"response": "No relevant documents found."}
 
