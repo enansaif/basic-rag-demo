@@ -1,0 +1,27 @@
+services:
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: chromadb
+    ports:
+      - "8001:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - ANONYMIZED_TELEMETRY=FALSE
+
+  fastapi-app:
+    build: .
+    container_name: fastapi-rag-app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app/app
+    environment:
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000
+    depends_on:
+      - chromadb
+
+volumes:
+  chroma_data:
