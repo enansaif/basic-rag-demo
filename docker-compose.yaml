@@ -21,6 +21,7 @@ services:
       - CHROMA_HOST=chromadb
       - CHROMA_PORT=8000
       - PYTHONPATH=/app
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
     depends_on:
       - chromadb
 
