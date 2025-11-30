@@ -56,7 +56,7 @@ Basic Error Handling: needed more time.
 Fixed Chunking: there are faar more complex chunking techniques out there.
 No Caching: repeated query will not be cached.
 Basic Generation Prompt: again would use langchain for complex projects, with their rich prompt library.
-No Image Processing: Currently images in pdf are just ignored.
+No Image Processing: Currently pdfs that have images can fail processing.
 
 ## Future Improvements
 
@@ -67,6 +67,7 @@ Replace fixed-size chunking with more intelligent methods (semantic chunking or 
 Add caching for repeated or similar queries.
 Integrate advanced prompt management tools (LangChain’s prompt library).
 Incorporate OCR and image embedding extraction so that images inside PDFs are analyzed.
+Write more test cases. The testcases that are there were set up at the project start but now fails because api signature changed during development.
 
 ## Video Link
 https://drive.google.com/file/d/1OU1tUqTtWh5r6jjx3jv9yegXSwn9KmoG/view?usp=sharing
