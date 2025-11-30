@@ -56,7 +56,11 @@ Basic Error Handling: needed more time.
 Fixed Chunking: there are faar more complex chunking techniques out there.
 No Caching: repeated query will not be cached.
 Basic Generation Prompt: again would use langchain for complex projects, with their rich prompt library.
+No Image Processing: Currently images in pdf are just ignored.
 
 ## Future Improvements
 
 Points in the limitations section would be considered for future improvements.
+
+## Video Link
+https://drive.google.com/file/d/1OU1tUqTtWh5r6jjx3jv9yegXSwn9KmoG/view?usp=sharing
