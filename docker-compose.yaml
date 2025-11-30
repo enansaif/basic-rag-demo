@@ -20,6 +20,7 @@ services:
     environment:
       - CHROMA_HOST=chromadb
       - CHROMA_PORT=8000
+      - PYTHONPATH=/app
     depends_on:
       - chromadb
 
