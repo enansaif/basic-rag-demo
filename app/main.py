@@ -11,11 +11,15 @@ async def root():
     return RedirectResponse(url="/docs")
 
 
-@app.post("/upload")
+@app.post("/upload-single")
 async def upload_file(file: UploadFile = File(...)):
     try:
         content = await file.read()
-        text = content.decode("utf-8", errors="ignore")
+
+        if file.content_type == "application/pdf":
+            text = utils.extract_text_from_pdf(content)
+        else:
+            text = content.decode("utf-8", errors="ignore")
 
         if not text.strip():
             raise HTTPException(status_code=400, detail="Uploaded file is empty.")

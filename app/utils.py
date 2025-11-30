@@ -1,3 +1,6 @@
+import io
+from PyPDF2 import PdfReader
+
 def chunk_text(text, chunk_size=1000, overlap=200):
     chunks = []
     start, end = 0, chunk_size
@@ -56,3 +59,11 @@ def process_chunks(chunks, config, filename):
         metadatas.append({"filename": filename, "chunk": i})
         documents.append(chunk)
     return ids, embeddings, metadatas, documents
+
+
+def extract_text_from_pdf(file_bytes: bytes) -> str:
+    text = ""
+    reader = PdfReader(io.BytesIO(file_bytes))
+    for page in reader.pages:
+        text += page.extract_text() or ""
+    return text
