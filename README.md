@@ -43,31 +43,31 @@ Basic RAG pipeline.
 
 ## Design Decisions & Trade-offs
 
-FastAPI Framework: Chosen for its async capabilities, automatic OpenAPI documentation.
-ChromaDB for Vector Storage: Selected for its simplicity, and my pre existing experience with it.
-Google Gemini API: Utilized for both embeddings and text generation to maintain consistency and reduce API complexity.
-Simple Chunking and Retrieval Strategy: I would have used langchain for bigger projects but for simple RAG pipeline i kept everything simple.
+- FastAPI Framework: Chosen for its async capabilities, automatic OpenAPI documentation.
+- ChromaDB for Vector Storage: Selected for its simplicity, and my pre existing experience with it.
+- Google Gemini API: Utilized for both embeddings and text generation to maintain consistency and reduce API complexity.
+- Simple Chunking and Retrieval Strategy: I would have used langchain for bigger projects but for simple RAG pipeline i kept everything simple.
 
 ## Limitations
 
-Supported Formats: only pdf and plain text files are supported.
-Concurrent Uploads: no batch processing for larger document sets.
-Basic Error Handling: needed more time.
-Fixed Chunking: there are faar more complex chunking techniques out there.
-No Caching: repeated query will not be cached.
-Basic Generation Prompt: again would use langchain for complex projects, with their rich prompt library.
-No Image Processing: Currently pdfs that have images can fail processing.
+- Supported Formats: only pdf and plain text files are supported.
+- Concurrent Uploads: no batch processing for larger document sets.
+- Basic Error Handling: needed more time.
+- Fixed Chunking: there are faar more complex chunking techniques out there.
+- No Caching: repeated query will not be cached.
+- Basic Generation Prompt: again would use langchain for complex projects, with their rich prompt library.
+- No Image Processing: Currently pdfs that have images can fail processing.
 
 ## Future Improvements
 
-Add support for additional document types such as DOCX, HTML, Markdown.
-Parallel processing to handle large document sets efficiently.
-Implement more robust error-handling mechanisms, including detailed logs, graceful fallbacks, and user-friendly error messages.
-Replace fixed-size chunking with more intelligent methods (semantic chunking or recursive text splitting) to improve context retention and retrieval accuracy.
-Add caching for repeated or similar queries.
-Integrate advanced prompt management tools (LangChain’s prompt library).
-Incorporate OCR and image embedding extraction so that images inside PDFs are analyzed.
-Write more test cases. The testcases that are there were set up at the project start but now fails because api signature changed during development.
+- Add support for additional document types such as DOCX, HTML, Markdown.
+- Parallel processing to handle large document sets efficiently.
+- Implement more robust error-handling mechanisms, including detailed logs, graceful fallbacks, and user-friendly error messages.
+- Replace fixed-size chunking with more intelligent methods (semantic chunking or recursive text splitting) to improve context retention and retrieval accuracy.
+- Add caching for repeated or similar queries.
+- Integrate advanced prompt management tools (LangChain’s prompt library).
+- Incorporate OCR and image embedding extraction so that images inside PDFs are analyzed.
+- Write more test cases. The testcases that are there were set up at the project start but now fails because api signature changed during development.
 
 ## Video Link
 https://drive.google.com/file/d/1OU1tUqTtWh5r6jjx3jv9yegXSwn9KmoG/view?usp=sharing
