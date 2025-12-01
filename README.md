@@ -2,7 +2,7 @@
 
 ### Prerequisites
 - Docker and Docker Compose
-- Google Gemini API key
+- Google Gemini API key (https://aistudio.google.com/api-keys)
 
 ### Environment Variables
 Create a `.env` file in the project root and set Gemini API key like .env.template
